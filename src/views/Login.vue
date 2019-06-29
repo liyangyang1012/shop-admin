@@ -65,9 +65,12 @@ export default {
             data: this.form
           }).then(({ data: { data, meta } }) => {
             // console.log(res);
-            console.log(data, meta);
+            // console.log(data, meta);
+            console.log(data);
             if (meta.status == 200) {
-              console.log(meta.msg);
+              // console.log(meta.msg);
+
+              localStorage.setItem("token", data.token);
               this.$router.push("/home");
             }
           });
