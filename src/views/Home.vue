@@ -19,7 +19,7 @@
     <el-container>
       <el-aside width="200px">
         <el-menu
-          default-active="2"
+          :default-active="$router.path"
           class="el-menu-vertical-demo"
           @open="handleOpen"
           @close="handleClose"
@@ -29,12 +29,12 @@
           :unique-opened="true"
           :router="true"
         >
-          <el-submenu index="1">
+          <el-submenu index="/user">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>用户管理</span>
             </template>
-            <el-menu-item index="user">
+            <el-menu-item index="/user">
               <i class="el-icon-menu"></i>
               <span>用户管理</span>
             </el-menu-item>
@@ -93,7 +93,9 @@
           </el-submenu>
         </el-menu>
       </el-aside>
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
