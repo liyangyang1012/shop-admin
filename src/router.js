@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from './views/Login.vue'
-import Home from './views/Home.vue'
-import User from './views/User.vue'
+import Login from './views/Login/Login.vue'
+import Home from './views/Home/Home.vue'
+import User from './views/User/User.vue'
+import Roles from './views/Roles/Roles.vue'
 
 Vue.use(Router)
 
@@ -24,6 +25,10 @@ const router = new Router({
           // 加/不加/的区别，加/就是/user,不加/就是/home/user
           path: '/user',
           component: User
+        },
+        {
+          path: '/roles',
+          component: Roles
         }
       ]
     }
