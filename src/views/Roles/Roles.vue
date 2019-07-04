@@ -23,14 +23,18 @@
             :key="level1.id"
           >
             <el-col :span="6">
-              <el-tag closable type="flex">{{level1.authName}}</el-tag>
+              <el-tag closable type="flex" @close="deleteRights(row, level1.id)">{{level1.authName}}</el-tag>
               <i class="el-icon-arrow-right"></i>
             </el-col>
             <!-- 2级菜单 -->
             <el-col>
               <el-row class="level2" type="flex" v-for="level2 in level1.children" :key="level2.id">
                 <el-col :span="6">
-                  <el-tag closable type="success">{{level2.authName}}</el-tag>
+                  <el-tag
+                    closable
+                    type="success"
+                    @close="deleteRights(row, level2.id)"
+                  >{{level2.authName}}</el-tag>
                   <i class="el-icon-arrow-right"></i>
                 </el-col>
                 <!-- 三级菜单 -->
@@ -41,6 +45,7 @@
                     type="warning"
                     v-for="level3 in level2.children"
                     :key="level3.id"
+                    @close="deleteRights(row, level3.id)"
                   >{{level3.authName}}</el-tag>
                 </el-col>
               </el-row>
@@ -118,12 +123,13 @@ export default {
     this.getRoleList();
   },
   methods: {
-    async getRoleList() {
+    async getRoleList(callback) {
       let res = await this.$http({
         url: "roles",
         method: "get"
       });
       this.rolesList = res.data.data;
+      callback && callback();
     },
     async showAssainRightsDialog(row) {
       this.currentEditRoleId = row.id;
@@ -172,6 +178,29 @@ export default {
 
       // 5. 将id拼接成字符串之后，发送Ajax请求，修改角色权限
       this.isAssainRightDialogShow = false;
+    },
+    async deleteRights(row, id) {
+      let res = await this.$http({
+        url: `roles/${row.id}/rights/${id}`,
+        method: "delete"
+      });
+      // console.log(res);
+      if (res.data.meta.status === 200) {
+        this.$message({
+          type: "success",
+          message: res.data.meta.msg,
+          duration: 1000
+        });
+        this.getRoleList(() => {
+          this.$nextTick(() => {
+            //让表格对应的项展开即可
+            this.$refs.roleTable.toggleRowExpansion(
+              this.roleList.find(v => v.id == row.id),
+              true
+            );
+          });
+        });
+      }
     }
   }
 };
