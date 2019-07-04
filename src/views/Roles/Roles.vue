@@ -55,10 +55,43 @@
         <template v-slot="{row}">
           <el-button type="primary" plain size="mini" icon="el-icon-edit"></el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" plain></el-button>
-          <el-button type="success" icon="el-icon-check" size="mini" plain>分配权限</el-button>
+          <el-button
+            type="success"
+            icon="el-icon-check"
+            size="mini"
+            plain
+            @click="showAssainRightsDialog(row)"
+          >分配权限</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分配权限模态框 -->
+    <el-dialog title="角色授权" :visible.sync="isAssainRightDialogShow">
+      <!-- 
+        data 是用来绑定数据的
+        show-checkbox是用来设置是否要展示checkbox
+        node-key指的是当前节点的唯一表示
+        default-expanded-keys 这是一个数组，表示默认让哪些节点展开
+        default-checked-keys 这是一个数组，表示默认选中哪些节点
+        props: children是用来指定子级树的数据属性名，label以及节点要展示到文字的属性名
+      -->
+      <!-- default-expand-all 是否默认展开所有节点 -->
+
+      <el-tree
+        :data="rightList"
+        show-checkbox
+        node-key="id"
+        :default-checked-keys="checkedRights"
+        :props="defaultProps"
+        :default-expand-all="true"
+        ref="rightsTree"
+      ></el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isAssainRightDialogShow = false">取 消</el-button>
+        <el-button type="primary" @click="updateRoleRights">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -66,7 +99,19 @@
 export default {
   data() {
     return {
-      rolesList: []
+      rolesList: [],
+      isAssainRightDialogShow: false,
+      rightList: [],
+      checkedRights: [],
+      // 这个是用来设置tree组件的 数据展示子节点以及展示的文字的
+      defaultProps: {
+        // 子集元素的属性名
+        children: "children",
+        // 当前节点展示的文字的属性名
+        label: "authName"
+      },
+      // 用来存储要编辑的row,id
+      currentEditRoleId: -1
     };
   },
   created() {
@@ -79,17 +124,55 @@ export default {
         method: "get"
       });
       this.rolesList = res.data.data;
+    },
+    async showAssainRightsDialog(row) {
+      this.currentEditRoleId = row.id;
+
+      this.isAssainRightDialogShow = true;
+      let res = await this.$http({
+        url: `rights/tree`
+      });
+      this.rightList = res.data.data;
+      // 4需要让tree组件中默认选中当前角色拥有的权限信息
+      // checkedRights: 我们需要把当前角色row中所有的权限的id，组合成一个数组，复制给checkedRights
+      let level3Ids = [];
+      row.children.forEach(level1 => {
+        level1.children.forEach(level2 => {
+          level2.children.forEach(level3 => {
+            level3Ids.push(level3.id);
+          });
+        });
+      });
+      this.checkedRights = [...level3Ids];
+    },
+    async updateRoleRights() {
+      // 1. 获取tree组件中，所有被勾选的ID
+      let ids = [
+        ...this.$refs.rightsTree.getCheckedKeys(),
+        ...this.$refs.rightsTree.getHalfCheckedKeys()
+      ].join(",");
+      console.log(ids);
+      // 2. 发送ajax请求
+      let res = await this.$http({
+        url: `roles/${this.currentEditRoleId}/rights`,
+        method: "post",
+        data: {
+          rids: ids
+        }
+      });
+      // 3. 提示用户更新成功
+      this.$message({
+        type: "success",
+        message: res.data.meta.msg,
+        duration: 1000
+      });
+
+      //4. 重新渲染权限列表
+      this.getRoleList();
+
+      // 5. 将id拼接成字符串之后，发送Ajax请求，修改角色权限
+      this.isAssainRightDialogShow = false;
     }
-    // getRoleRights(row, expandedRows) {
-    //   // row就是当前行的数据
-    //   // console.log(row);
-    //   if (expandedRows.length) {
-    //     console.log("打开");
-    //   } else {
-    //     console.log("关闭");
-    //   }
-    // }
-    // 接口不支持  无法实现
   }
 };
 </script>
