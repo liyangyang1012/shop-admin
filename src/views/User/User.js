@@ -71,13 +71,34 @@ export default {
             trigger: 'change'
           }
         ]
-      }
+      },
+      showAssainRoleDialog: false,
+      assainRoleData: {
+        username: '',
+        rid: ''
+      },
+      roleList: []
     }
   },
   created() {
     this.getUserList()
   },
   methods: {
+    async updateRole() {
+      let res = await this.$http({
+        url: `users/${this.assainRoleData.id}/role`,
+        method: 'put',
+        data: {
+          rid: this.assainRoleData.rid
+        }
+      })
+      this.$message({
+        type: 'success',
+        message: res.data.meta.msg,
+        duration: 1000
+      })
+      this.showAssainRoleDialog = false
+    },
     // 请求用户数据
     getUserList() {
       this.$http({
@@ -222,6 +243,21 @@ export default {
           })
         }
       } catch {}
+    },
+    updateRole() {
+      this.showAssainRoleDialog = false
+    },
+    async openshowAssainRoleDialog(row) {
+      this.isAssainRoleDialogShow = true
+      let res = await this.$http({
+        url: `users/${row.id}`
+      })
+      this.assainRoleData = res.data.data
+      let roleResult = await this.$http({
+        url: 'roles'
+      })
+      this.roleList = roleResult.data.data
+      this.showAssainRoleDialog = true
     }
   }
 }

@@ -55,7 +55,12 @@
           plain
           @click="delUser(row.id)"
         ></el-button>
-        <el-button type="success" icon="el-icon-check" size="mini" plain
+        <el-button
+          type="success"
+          icon="el-icon-check"
+          size="mini"
+          plain
+          @click="openshowAssainRoleDialog(row)"
           >分配角色</el-button
         >
       </template>
@@ -125,6 +130,29 @@
     <div slot="footer" class="dialog-footer">
       <el-button @click="isEditUserDialogShow=false">取 消</el-button>
       <el-button type="primary" @click="editUser">确 定</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 分配角色模态框 -->
+  <el-dialog title="分配角色" :visible.sync="showAssainRoleDialog">
+    <el-form :model="assainRoleData" label-width="100px">
+      <el-form-item label="用户名" prop="username">
+        <el-tag type="info" v-text="assainRoleData.username"></el-tag>
+      </el-form-item>
+      <el-form-item label="角色">
+        <el-select v-model="assainRoleData.rid" placeholder="请选择角色">
+          <el-option
+            v-for="item in roleList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="showAssainRoleDialog = false">取 消</el-button>
+      <el-button type="primary" @click="updateRole">确 定</el-button>
     </div>
   </el-dialog>
 </div>
