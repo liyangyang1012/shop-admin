@@ -1,0 +1,43 @@
+<div class="goods">
+  <!-- 面包屑导航 -->
+  <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+    <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+    <el-breadcrumb-item>商品列表</el-breadcrumb-item>
+  </el-breadcrumb>
+
+  <!-- 添加商品按钮 -->
+  <el-row class="addBtn">
+    <el-button type="success" plain>添加商品</el-button>
+  </el-row>
+
+  <!-- 列表 -->
+  <el-table
+    ref="singleTable"
+    :data="goodsList"
+    highlight-current-row
+    style="width: 100%"
+    stripe
+  >
+    <el-table-column type="index" width="50"></el-table-column>
+    <el-table-column property="goods_name" label="商品名称"> </el-table-column>
+    <el-table-column property="goods_price" label="商品价格"> </el-table-column>
+    <el-table-column property="goods_weight" label="商品重量"></el-table-column>
+    <el-table-column property="upd_time" label="创建时间"></el-table-column>
+    <el-table-column label="操作">
+      <el-button type="primary" icon="el-icon-edit" plain></el-button>
+      <el-button type="danger" icon="el-icon-delete" plain></el-button>
+    </el-table-column>
+  </el-table>
+
+  <!-- 分页 -->
+  <el-pagination
+    background
+    layout="prev, pager, next"
+    :total="total"
+    :page-size="pagesize"
+    :current-page="pagenum"
+    @current-change="changePage"
+  >
+  </el-pagination>
+</div>

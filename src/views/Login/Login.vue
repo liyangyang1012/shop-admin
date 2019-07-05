@@ -64,7 +64,8 @@ export default {
           }).then(({ data: { data, meta } }) => {
             // console.log(res);
             // console.log(data, meta);
-            console.log(data);
+            // console.log(data);
+            // console.log(res);
             if (meta.status == 200) {
               // console.log(meta.msg);
 
